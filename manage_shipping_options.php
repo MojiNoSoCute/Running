@@ -176,8 +176,8 @@
                                     echo "{$ship['type']}";
                                     echo "</td>";
                                     echo "<td><span class='badge {$costClass}'>" . number_format($ship['cost'], 2) . "</span></td>";
-                                    echo "<td>" . (strlen($ship['detail']) > 50 ? substr($ship['detail'], 0, 50) . '...' : ($ship['detail'] ?? '-')) . "</td>";
-                                    echo "<td>" . date('d/m/Y', strtotime($ship['created_at'])) . "</td>";
+                                    echo "<td>" . (isset($ship['detail']) && strlen($ship['detail']) > 50 ? substr($ship['detail'], 0, 50) . '...' : (isset($ship['detail']) ? $ship['detail'] : '-')) . "</td>";
+                                    echo "<td>" . (isset($ship['created_at']) ? date('d/m/Y', strtotime($ship['created_at'])) : '-') . "</td>";
                                     echo "<td class='text-center'>";
                                     echo "<button class='btn btn-sm btn-warning me-1' onclick='editShipping({$ship['shipping_id']})'>";
                                     echo "<i class='fa-solid fa-edit'></i></button>";

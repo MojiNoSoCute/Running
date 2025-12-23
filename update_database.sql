@@ -1,0 +1,39 @@
+-- Update existing database to add missing created_at columns
+USE running;
+
+-- Add created_at column to PRICE_RATE if it doesn't exist
+ALTER TABLE PRICE_RATE 
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Add created_at column to SHIPPING_OPTION if it doesn't exist  
+ALTER TABLE SHIPPING_OPTION 
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Add created_at column to AGE_GROUP if it doesn't exist
+ALTER TABLE AGE_GROUP 
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Add created_at column to RUNNER if it doesn't exist
+ALTER TABLE RUNNER 
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Add created_at column to RACE_CATEGORY if it doesn't exist
+ALTER TABLE RACE_CATEGORY 
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Add created_at column to REGISTRATION if it doesn't exist
+ALTER TABLE REGISTRATION 
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Add created_at column to PAYMENT if it doesn't exist
+ALTER TABLE PAYMENT 
+ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+
+-- Update existing records to have current timestamp if created_at is NULL
+UPDATE PRICE_RATE SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL;
+UPDATE SHIPPING_OPTION SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL;
+UPDATE AGE_GROUP SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL;
+UPDATE RUNNER SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL;
+UPDATE RACE_CATEGORY SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL;
+UPDATE REGISTRATION SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL;
+UPDATE PAYMENT SET created_at = CURRENT_TIMESTAMP WHERE created_at IS NULL;

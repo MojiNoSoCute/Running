@@ -97,7 +97,7 @@
                                     echo "<td>" . number_format($cat['distance_km'], 1) . "</td>";
                                     echo "<td>" . substr($cat['start_time'], 0, 5) . "</td>";
                                     echo "<td>" . (isset($cat['time_limit']) ? substr($cat['time_limit'], 0, 5) : '-') . "</td>";
-                                    echo "<td>" . ($cat['giveaway_type'] ?? '-') . "</td>";
+                                    echo "<td>" . (isset($cat['giveaway_type']) ? $cat['giveaway_type'] : '-') . "</td>";
                                     echo "<td class='text-center'>";
                                     echo "<button class='btn btn-sm btn-warning me-1' onclick='editCategory({$cat['category_id']})'>";
                                     echo "<i class='fa-solid fa-edit'></i></button>";

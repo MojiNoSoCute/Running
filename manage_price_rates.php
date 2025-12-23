@@ -182,7 +182,7 @@
                                     echo "<td>{$price['category_name']}</td>";
                                     echo "<td><span class='badge {$badgeClass}'>{$price['runner_type']}</span></td>";
                                     echo "<td>" . number_format($price['amount'], 2) . "</td>";
-                                    echo "<td>" . date('d/m/Y', strtotime($price['created_at'])) . "</td>";
+                                    echo "<td>" . (isset($price['created_at']) ? date('d/m/Y', strtotime($price['created_at'])) : '-') . "</td>";
                                     echo "<td class='text-center'>";
                                     echo "<button class='btn btn-sm btn-warning me-1' onclick='editPriceRate({$price['price_id']})'>";
                                     echo "<i class='fa-solid fa-edit'></i></button>";
