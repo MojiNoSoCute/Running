@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบเช็คอิน & รับอุปกรณ์วิ่ง (Race Day Check-in) - <%= settings.event_name %></title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/alert-popup.css">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f0f2f5;
+        }
+
+        .stat-card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .checkin-row {
+            transition: all 0.2s;
+        }
+
+        .checkin-row.checked-in {
+            background-color: #e8f5e9 !important;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/admin_index.php">
+                <i class="fa-solid fa-clipboard-user text-primary me-2"></i>ระบบเช็คอิน & รับเบอร์วิ่ง (Race Day Kit Distribution)
+            </a>
+            <div class="ms-auto">
+                <a href="/admin_index.php" class="btn btn-outline-light btn-sm">
+                    <i class="fa-solid fa-arrow-left me-1"></i>กลับแดชบอร์ด
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mb-5">
+        <!-- Live Stat Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card stat-card bg-primary text-white p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-white-50">นักวิ่งทั้งหมด</small>
+                            <h3 class="fw-bold mb-0" id="stat-total"><%= stats.total %></h3>
+                        </div>
+                        <i class="fa-solid fa-users fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card bg-success text-white p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-white-50">รับเสื้อ & BIB แล้ว</small>
+                            <h3 class="fw-bold mb-0" id="stat-checked"><%= stats.checkedIn %></h3>
+                        </div>
+                        <i class="fa-solid fa-box-open fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card stat-card bg-warning text-dark p-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-dark-50">ยังไม่ได้รับ</small>
+                            <h3 class="fw-bold mb-0" id="stat-pending"><%= stats.pending %></h3>
+                        </div>
+                        <i class="fa-solid fa-hourglass-half fa-2x opacity-50"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search / Barcode Scanner Input -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-8">
+                        <label class="form-label fw-bold"><i class="fa-solid fa-barcode me-2 text-primary"></i>สแกนบาร์โค้ด / ค้นหา BIB, เลขบัตรประชาชน, Reg ID, หรือชื่อ</label>
+                        <div class="input-group input-group-lg">
+                            <span class="input-group-text bg-white"><i class="fa-solid fa-magnifying-glass"></i></span>
+                            <input type="text" id="checkin-search" class="form-control" placeholder="พิมพ์หรือยิงเครื่องสแกน BIB หรือ บัตรประชาชน..." autofocus onkeyup="filterCheckins()">
+                            <button class="btn btn-secondary" onclick="document.getElementById('checkin-search').value=''; filterCheckins();">ล้าง</button>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-bold">กรองสถานะ</label>
+                        <select id="status-filter" class="form-select form-select-lg" onchange="filterCheckins()">
+                            <option value="">ทั้งหมด</option>
+                            <option value="pending">ยังไม่ได้รับ</option>
+                            <option value="checked">รับแล้ว</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Check-in Table Card -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-list-check me-2"></i>รายชื่อนักวิ่งสำหรับรับอุปกรณ์</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>BIB</th>
+                                <th>Reg ID</th>
+                                <th>ชื่อ - นามสกุล</th>
+                                <th>เลขบัตรประชาชน</th>
+                                <th>ระยะทาง</th>
+                                <th>ไซส์เสื้อ</th>
+                                <th>สถานะชำระเงิน</th>
+                                <th>สถานะรับอุปกรณ์</th>
+                                <th class="text-center">การดำเนินการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="checkin-table">
+                            <% registrations.forEach(function(r) { %>
+                                <tr class="checkin-row <%= r.checkin_status === 1 ? 'checked-in' : '' %>"
+                                    id="row-<%= r.reg_id %>"
+                                    data-bib="<%= r.bib_number || '' %>"
+                                    data-reg="<%= r.reg_id %>"
+                                    data-name="<%= r.first_name %> <%= r.last_name %>"
+                                    data-citizen="<%= r.citizen_id %>"
+                                    data-status="<%= r.checkin_status === 1 ? 'checked' : 'pending' %>">
+                                    <td>
+                                        <% if (r.bib_number) { %>
+                                            <span class="badge bg-primary fs-6 px-3 py-2"><%= r.bib_number %></span>
+                                        <% } else { %>
+                                            <span class="badge bg-secondary">-</span>
+                                        <% } %>
+                                    </td>
+                                    <td class="fw-bold">#<%= r.reg_id %></td>
+                                    <td>
+                                        <div class="fw-bold"><%= r.first_name %> <%= r.last_name %></div>
+                                        <small class="text-muted"><%= r.phone %></small>
+                                    </td>
+                                    <td><code><%= r.citizen_id %></code></td>
+                                    <td><span class="badge bg-dark"><%= r.category_name %></span></td>
+                                    <td><span class="badge bg-light text-dark border fs-6"><%= r.shirt_size %></span></td>
+                                    <td>
+                                        <% if (r.status === 'Paid') { %>
+                                            <span class="badge bg-success">ชำระแล้ว</span>
+                                        <% } else { %>
+                                            <span class="badge bg-warning text-dark">ยังไม่ชำระ</span>
+                                        <% } %>
+                                    </td>
+                                    <td id="status-cell-<%= r.reg_id %>">
+                                        <% if (r.checkin_status === 1) { %>
+                                            <span class="badge bg-success"><i class="fa-solid fa-check me-1"></i>รับแล้ว</span>
+                                            <small class="d-block text-muted" style="font-size: 0.75rem;"><%= r.checkin_time %></small>
+                                        <% } else { %>
+                                            <span class="badge bg-secondary">ยังไม่รับ</span>
+                                        <% } %>
+                                    </td>
+                                    <td class="text-center">
+                                        <button class="btn btn-sm <%= r.checkin_status === 1 ? 'btn-outline-danger' : 'btn-success' %> fw-bold"
+                                                id="btn-checkin-<%= r.reg_id %>"
+                                                onclick="toggleCheckin(<%= r.reg_id %>)">
+                                            <i class="fa-solid <%= r.checkin_status === 1 ? 'fa-rotate-left' : 'fa-check-circle' %> me-1"></i>
+                                            <%= r.checkin_status === 1 ? 'ยกเลิก' : 'บันทึกรับของ' %>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <% }); %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/alert-popup.js"></script>
+    <script>
+        function filterCheckins() {
+            const query = document.getElementById('checkin-search').value.toLowerCase().trim();
+            const statusFilter = document.getElementById('status-filter').value;
+            const rows = document.querySelectorAll('#checkin-table tr');
+
+            rows.forEach(row => {
+                const bib = (row.dataset.bib || '').toLowerCase();
+                const reg = (row.dataset.reg || '').toLowerCase();
+                const name = (row.dataset.name || '').toLowerCase();
+                const citizen = (row.dataset.citizen || '').toLowerCase();
+                const status = row.dataset.status;
+
+                let matchSearch = !query || bib.includes(query) || reg.includes(query) || name.includes(query) || citizen.includes(query);
+                let matchStatus = !statusFilter || status === statusFilter;
+
+                row.style.display = (matchSearch && matchStatus) ? '' : 'none';
+            });
+        }
+
+        function toggleCheckin(regId) {
+            fetch('/api/checkin', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reg_id: regId, checked_by: 'เจ้าหน้าที่จุดรับเบอร์วิ่ง' })
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    const row = document.getElementById('row-' + regId);
+                    const cell = document.getElementById('status-cell-(' + regId + ')') || document.getElementById('status-cell-' + regId);
+                    const btn = document.getElementById('btn-checkin-' + regId);
+
+                    if (res.checkin_status === 1) {
+                        row.classList.add('checked-in');
+                        row.dataset.status = 'checked';
+                        cell.innerHTML = `<span class="badge bg-success"><i class="fa-solid fa-check me-1"></i>รับแล้ว</span><small class="d-block text-muted" style="font-size: 0.75rem;">${res.checkin_time}</small>`;
+                        btn.className = 'btn btn-sm btn-outline-danger fw-bold';
+                        btn.innerHTML = '<i class="fa-solid fa-rotate-left me-1"></i>ยกเลิก';
+                        showSuccess('บันทึกการรับเสื้อ & เบอร์วิ่งสำเร็จ!', 'เช็คอินสำเร็จ');
+                    } else {
+                        row.classList.remove('checked-in');
+                        row.dataset.status = 'pending';
+                        cell.innerHTML = `<span class="badge bg-secondary">ยังไม่รับ</span>`;
+                        btn.className = 'btn btn-sm btn-success fw-bold';
+                        btn.innerHTML = '<i class="fa-solid fa-check-circle me-1"></i>บันทึกรับของ';
+                        showInfo('ยกเลิกสถานะการรับของเรียบร้อย');
+                    }
+
+                    // Update live stats
+                    updateLiveStats();
+                } else {
+                    showError(res.message);
+                }
+            });
+        }
+
+        function updateLiveStats() {
+            const rows = document.querySelectorAll('#checkin-table tr');
+            let checked = 0;
+            rows.forEach(r => {
+                if (r.dataset.status === 'checked') checked++;
+            });
+            const total = rows.length;
+            const pending = total - checked;
+
+            document.getElementById('stat-total').textContent = total;
+            document.getElementById('stat-checked').textContent = checked;
+            document.getElementById('stat-pending').textContent = pending;
+        }
+    </script>
+</body>
+
+</html>

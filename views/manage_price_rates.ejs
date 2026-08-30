@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการอัตราค่าสมัคร - Running Admin</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/alert-popup.css">
+</head>
+
+<body class="bg-light">
+
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-tags me-2"></i>จัดการอัตราค่าสมัคร (Price Rates Management)</span>
+            <a href="admin_index.php" class="btn btn-outline-light btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i>กลับแดชบอร์ด
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Add / Edit Form Card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0 fw-bold" id="form-title">เพิ่มอัตราค่าสมัครใหม่</h5>
+            </div>
+            <div class="card-body">
+                <form id="price-rate-form" action="crud_price_rate.php" method="POST">
+                    <input type="hidden" name="action" value="create" id="form-action">
+                    <input type="hidden" name="price_id" id="price_id">
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">ประเภทการแข่งขัน</label>
+                            <select name="category_id" id="category_id" class="form-select" required>
+                                <option value="">-- เลือกประเภทการแข่งขัน --</option>
+                                <% categories.forEach(function(cat) { %>
+                                    <option value="<%= cat.category_id %>"><%= cat.name %> (<%= cat.distance_km %> KM)</option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ประเภทนักวิ่ง</label>
+                            <select name="runner_type" id="runner_type" class="form-select" required>
+                                <option value="">-- เลือกประเภทนักวิ่ง --</option>
+                                <option value="Standard">Standard (ทั่วไป)</option>
+                                <option value="Senior 70+">Senior 70+ (ผู้สูงอายุ)</option>
+                                <option value="Disabled">Disabled (ผู้พิการ)</option>
+                                <option value="Student">Student (นักเรียน/นักศึกษา)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">ค่าสมัคร (บาท)</label>
+                            <input type="number" step="0.01" name="amount" id="amount" class="form-control" placeholder="เช่น 500.00" min="0" required>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-warning fw-bold text-dark" id="submit-btn">
+                            <i class="fa-solid fa-save me-1"></i>บันทึกข้อมูล
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                            <i class="fa-solid fa-times me-1"></i>ยกเลิก
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="row mb-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white text-center p-2 border-0 shadow-sm">
+                    <h5><%= standardCount %></h5>
+                    <small>Standard (ทั่วไป)</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white text-center p-2 border-0 shadow-sm">
+                    <h5><%= seniorCount %></h5>
+                    <small>Senior 70+</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white text-center p-2 border-0 shadow-sm">
+                    <h5><%= disabledCount %></h5>
+                    <small>Disabled (ผู้พิการ)</small>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-secondary text-white text-center p-2 border-0 shadow-sm">
+                    <h5><%= studentCount %></h5>
+                    <small>Student (นักเรียน)</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 fw-bold">รายการอัตราค่าสมัครทั้งหมด (<%= price_rates.length %> อัตรา)</h5>
+                <div class="d-flex gap-2">
+                    <select class="form-select form-select-sm" id="type-filter" style="width: 150px;" onchange="applyFilters()">
+                        <option value="">ทุกประเภท</option>
+                        <option value="Standard">Standard</option>
+                        <option value="Senior 70+">Senior 70+</option>
+                        <option value="Disabled">Disabled</option>
+                        <option value="Student">Student</option>
+                    </select>
+                    <input type="text" class="form-control form-control-sm" placeholder="ค้นหา..." id="search-input" style="width: 200px;" onkeyup="applyFilters()">
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0 align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>ประเภทการแข่งขัน</th>
+                                <th>ประเภทนักวิ่ง</th>
+                                <th>ค่าสมัคร (บาท)</th>
+                                <th>วันที่บันทึก</th>
+                                <th class="text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="prices-table">
+                            <% if (price_rates.length > 0) { %>
+                                <% price_rates.forEach(function(price) { %>
+                                    <tr data-type="<%= price.runner_type %>">
+                                        <td><strong>#<%= price.price_id %></strong></td>
+                                        <td><%= price.category_name %></td>
+                                        <td>
+                                            <% if (price.runner_type === 'Standard') { %>
+                                                <span class="badge bg-primary">Standard</span>
+                                            <% } else if (price.runner_type === 'Senior 70+') { %>
+                                                <span class="badge bg-info">Senior 70+</span>
+                                            <% } else if (price.runner_type === 'Disabled') { %>
+                                                <span class="badge bg-success">Disabled</span>
+                                            <% } else { %>
+                                                <span class="badge bg-secondary"><%= price.runner_type %></span>
+                                            <% } %>
+                                        </td>
+                                        <td class="fw-bold text-success"><%= Number(price.amount).toFixed(2) %> บาท</td>
+                                        <td><%= price.created_at ? price.created_at.slice(0, 10) : '-' %></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-warning me-1" onclick="editPriceRate(<%= price.price_id %>)">
+                                                <i class="fa-solid fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="deletePriceRate(<%= price.price_id %>)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr><td colspan="6" class="text-center py-4 text-muted">ยังไม่มีข้อมูลอัตราค่าสมัคร</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/alert-popup.js"></script>
+    <script>
+        function resetForm() {
+            document.getElementById('price-rate-form').reset();
+            document.getElementById('form-action').value = 'create';
+            document.getElementById('price_id').value = '';
+            document.getElementById('form-title').textContent = 'เพิ่มอัตราค่าสมัครใหม่';
+            document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-save me-1"></i>บันทึกข้อมูล';
+        }
+
+        function editPriceRate(id) {
+            fetch(`crud_price_rate.php?action=get&id=${id}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        const d = res.data;
+                        document.getElementById('form-action').value = 'update';
+                        document.getElementById('price_id').value = d.price_id;
+                        document.getElementById('category_id').value = d.category_id;
+                        document.getElementById('runner_type').value = d.runner_type;
+                        document.getElementById('amount').value = d.amount;
+
+                        document.getElementById('form-title').textContent = 'แก้ไขอัตราค่าสมัคร ID #' + d.price_id;
+                        document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-save me-1"></i>อัปเดตข้อมูล';
+                        document.getElementById('price-rate-form').scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+        }
+
+        function deletePriceRate(id) {
+            showConfirm('คุณแน่ใจหรือไม่ที่จะลบอัตราค่าสมัครนี้?', 'ยืนยันการลบ', () => {
+                fetch('crud_price_rate.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `action=delete&price_id=${id}`
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        showSuccess(res.message, 'สำเร็จ', () => location.reload());
+                    } else {
+                        showError(res.message);
+                    }
+                });
+            });
+        }
+
+        function applyFilters() {
+            const type = document.getElementById('type-filter').value;
+            const search = document.getElementById('search-input').value.toLowerCase();
+            const rows = document.querySelectorAll('#prices-table tr');
+
+            rows.forEach(r => {
+                let show = true;
+                if (type && r.dataset.type !== type) show = false;
+                if (search && !r.textContent.toLowerCase().includes(search)) show = false;
+                r.style.display = show ? '' : 'none';
+            });
+        }
+    </script>
+</body>
+
+</html>

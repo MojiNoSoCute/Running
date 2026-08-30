@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Ticket บัตรประจำตัวนักวิ่ง - <%= runner.first_name %> <%= runner.last_name %> | <%= settings.event_name %></title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #e9ecef;
+            color: #333;
+        }
+
+        .ticket-wrapper {
+            max-width: 800px;
+            margin: 40px auto;
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+            border: 2px dashed #ced4da;
+        }
+
+        .ticket-header {
+            background: linear-gradient(135deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+            color: white;
+            padding: 30px;
+            position: relative;
+        }
+
+        .bib-hero {
+            background: linear-gradient(135deg, #ff8008 0%, #ffc837 100%);
+            color: #111;
+            font-weight: 800;
+            font-size: 3.2rem;
+            padding: 10px 25px;
+            border-radius: 15px;
+            letter-spacing: 2px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(255, 128, 8, 0.3);
+            display: inline-block;
+        }
+
+        .ticket-body {
+            padding: 35px;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .info-value {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .qr-box {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            text-align: center;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .no-print {
+                display: none !important;
+            }
+            .ticket-wrapper {
+                margin: 0;
+                box-shadow: none;
+                border: 1px solid #000;
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <!-- Print Action Bar -->
+        <div class="d-flex justify-content-between align-items-center mt-4 no-print" style="max-width: 800px; margin: auto;">
+            <a href="/check_status.php?q=<%= runner.reg_id %>" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i>ย้อนกลับ
+            </a>
+            <div>
+                <button onclick="window.print()" class="btn btn-primary fw-bold px-4">
+                    <i class="fa-solid fa-print me-2"></i>พิมพ์บัตรวิ่ง / บันทึกเป็น PDF
+                </button>
+            </div>
+        </div>
+
+        <!-- Ticket Card -->
+        <div class="ticket-wrapper my-4">
+            <div class="ticket-header">
+                <div class="row align-items-center">
+                    <div class="col-sm-8">
+                        <span class="badge bg-danger mb-2 px-3 py-2 fs-6">OFFICIAL RUNNER PASS</span>
+                        <h2 class="fw-bold mb-1"><%= settings.event_name %></h2>
+                        <p class="mb-0 text-white-50"><%= settings.event_subtitle %></p>
+                        <small class="text-white-50"><i class="fa-solid fa-calendar-day me-1"></i><%= settings.event_date %> | <i class="fa-solid fa-location-dot me-1"></i><%= settings.event_location %></small>
+                    </div>
+                    <div class="col-sm-4 text-sm-end mt-3 mt-sm-0">
+                        <div class="bib-hero">
+                            <%= runner.bib_number || 'PENDING' %>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ticket-body">
+                <div class="row g-4">
+                    <div class="col-md-8">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <div class="info-label">ชื่อ - นามสกุล</div>
+                                <div class="info-value text-primary fs-4"><%= runner.first_name %> <%= runner.last_name %></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="info-label">เลขประจำตัวประชาชน</div>
+                                <div class="info-value"><code><%= runner.citizen_id %></code></div>
+                            </div>
+
+                            <div class="col-sm-6">
+                                <div class="info-label">ประเภทการแข่งขัน</div>
+                                <div class="info-value"><span class="badge bg-dark fs-6"><%= runner.category_name %> (<%= runner.distance_km %> KM)</span></div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="info-label">เวลาปล่อยตัว (Gun Time)</div>
+                                <div class="info-value text-danger"><i class="fa-solid fa-clock me-1"></i><%= runner.start_time %> น.</div>
+                            </div>
+
+                            <div class="col-sm-4">
+                                <div class="info-label">ไซส์เสื้อ</div>
+                                <div class="info-value"><%= runner.shirt_size %></div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="info-label">เพศ / อายุ</div>
+                                <div class="info-value"><%= runner.gender === 'Male' ? 'ชาย' : 'หญิง' %> (<%= 2026 - (runner.date_of_birth ? new Date(runner.date_of_birth).getFullYear() : 1995) %> ปี)</div>
+                            </div>
+                            <div class="col-sm-4">
+                                <div class="info-label">เบอร์โทรศัพท์</div>
+                                <div class="info-value"><%= runner.phone %></div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="info-label">การรับของที่ระลึก & เบอร์วิ่ง</div>
+                                <div class="info-value fs-6"><%= runner.shipping_type %> - <span class="text-muted"><%= runner.shipping_detail %></span></div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="p-3 bg-light rounded-3 border">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <small class="text-muted d-block">สถานะการชำระเงิน</small>
+                                            <strong class="text-success"><i class="fa-solid fa-circle-check me-1"></i>ชำระเงินเรียบร้อย (Registration ID: #<%= runner.reg_id %>)</strong>
+                                        </div>
+                                        <div>
+                                            <% if (runner.checkin_status === 1) { %>
+                                                <span class="badge bg-success p-2"><i class="fa-solid fa-check me-1"></i>รับเบอร์วิ่งแล้ว</span>
+                                            <% } else { %>
+                                                <span class="badge bg-secondary p-2"><i class="fa-solid fa-hourglass-start me-1"></i>ยังไม่ได้รับเบอร์วิ่ง</span>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-4 text-center">
+                        <div class="qr-box">
+                            <img src="<%= qrImage %>" alt="QR Pass" class="img-fluid rounded mb-2" style="max-width: 200px;">
+                            <div class="fw-bold small text-muted">QR เช็คอินรับเบอร์วิ่ง</div>
+                            <code class="d-block small text-dark mt-1">#<%= runner.reg_id %> - <%= runner.bib_number %></code>
+                        </div>
+                        <div class="mt-3 text-start small text-muted">
+                            <p class="mb-1"><i class="fa-solid fa-circle-exclamation text-warning me-1"></i>โปรดนำบัตรนี้พร้อมบัตรประชาชนมาแสดงในวันรับ Race Kit</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer rules -->
+            <div class="bg-light p-3 border-top text-center text-muted small">
+                งานวิ่ง <%= settings.event_name %> ณ <%= settings.event_location %> | ติดต่อสอบถาม โทร 081-234-5678
+            </div>
+        </div>
+    </div>
+
+</body>
+
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการฐานข้อมูล & สำรองข้อมูล - <%= settings.event_name %></title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/alert-popup.css">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        .db-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-database text-primary me-2"></i>จัดการฐานข้อมูล & การสำรองข้อมูล (Database Management)</span>
+            <a href="/admin_index.php" class="btn btn-outline-light btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i>กลับแดชบอร์ด
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mb-5">
+        <!-- Database Summary -->
+        <div class="card db-card mb-4">
+            <div class="card-header bg-white py-3">
+                <h5 class="mb-0 fw-bold"><i class="fa-solid fa-server me-2 text-primary"></i>สถานะข้อมูลในระบบปัจจุบัน</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3 text-center">
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <small class="text-muted">นักวิ่ง (Runners)</small>
+                            <h3 class="fw-bold text-primary mb-0"><%= stats.runners %></h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <small class="text-muted">การสมัคร (Registrations)</small>
+                            <h3 class="fw-bold text-success mb-0"><%= stats.registrations %></h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <small class="text-muted">การชำระเงิน (Payments)</small>
+                            <h3 class="fw-bold text-warning text-dark mb-0"><%= stats.payments %></h3>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-3">
+                        <div class="p-3 bg-light rounded-3 border">
+                            <small class="text-muted">ประเภทการแข่งขัน</small>
+                            <h3 class="fw-bold text-danger mb-0"><%= stats.categories %></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Backup & Export -->
+            <div class="col-md-6">
+                <div class="card db-card h-100 p-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="p-3 bg-primary text-white rounded-circle me-3">
+                                <i class="fa-solid fa-cloud-arrow-down fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">สำรองข้อมูล & ส่งออก (Backup & Export)</h5>
+                                <small class="text-muted">ดาวน์โหลดข้อมูลทั้งหมดเก็บไว้ในคอมพิวเตอร์ของคุณ</small>
+                            </div>
+                        </div>
+                        <p class="text-muted small">คุณสามารถดาวน์โหลดไฟล์สำรองข้อมูล JSON หรือส่งออกรายชื่อผู้สมัครเป็นไฟล์ Excel / CSV เพื่อนำไปใช้งานต่อได้ทันที</p>
+                        <div class="d-grid gap-2">
+                            <a href="/api/database/backup" class="btn btn-primary fw-bold">
+                                <i class="fa-solid fa-download me-2"></i>ดาวน์โหลดไฟล์สำรอง JSON (Full Backup)
+                            </a>
+                            <a href="/export_registrations.php" class="btn btn-outline-success fw-bold">
+                                <i class="fa-solid fa-file-csv me-2"></i>ส่งออกรายชื่อผู้สมัคร (CSV for Excel)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Restore Database -->
+            <div class="col-md-6">
+                <div class="card db-card h-100 p-3">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="p-3 bg-warning text-dark rounded-circle me-3">
+                                <i class="fa-solid fa-cloud-arrow-up fa-2x"></i>
+                            </div>
+                            <div>
+                                <h5 class="fw-bold mb-1">กู้คืนข้อมูล (Restore Database)</h5>
+                                <small class="text-muted">นำเข้าไฟล์ JSON ที่เคยสำรองไว้</small>
+                            </div>
+                        </div>
+                        <p class="text-muted small">เลือกไฟล์ .json ที่เคยสำรองไว้ เพื่อเขียนทับและกู้คืนข้อมูลทั้งหมดกลับมา</p>
+                        <div class="mb-3">
+                            <input type="file" id="restore-file" accept=".json" class="form-control">
+                        </div>
+                        <button onclick="handleRestore()" class="btn btn-warning text-dark fw-bold w-100">
+                            <i class="fa-solid fa-upload me-2"></i>กู้คืนข้อมูลจากไฟล์
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reset Database -->
+            <div class="col-12">
+                <div class="card db-card border-danger p-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                            <div>
+                                <h5 class="fw-bold text-danger mb-1"><i class="fa-solid fa-triangle-exclamation me-2"></i>รีเซ็ตข้อมูลทั้งหมดเป็นค่าเริ่มต้น (Reset to Default Demo Data)</h5>
+                                <p class="text-muted small mb-0">การกระทำนี้จะล้างข้อมูลการสมัครใหม่และคืนค่าข้อมูลตัวอย่างตั้งต้นตามสคริปต์ SQL</p>
+                            </div>
+                            <div>
+                                <button onclick="handleReset()" class="btn btn-outline-danger fw-bold">
+                                    <i class="fa-solid fa-rotate-left me-1"></i>รีเซ็ตข้อมูลเริ่มต้น
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/alert-popup.js"></script>
+    <script>
+        function handleRestore() {
+            const fileInput = document.getElementById('restore-file');
+            if (!fileInput.files || fileInput.files.length === 0) {
+                showError('กรุณาเลือกไฟล์ JSON ที่ต้องการกู้คืน');
+                return;
+            }
+
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const content = e.target.result;
+                showConfirm('คุณแน่ใจหรือไม่ว่าต้องการกู้คืนข้อมูลจากไฟล์นี้? ข้อมูลปัจจุบันจะถูกแทนที่', 'ยืนยันการกู้คืน', () => {
+                    fetch('/api/database/restore', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ json_data: content })
+                    })
+                    .then(r => r.json())
+                    .then(res => {
+                        if (res.success) {
+                            showSuccess('กู้คืนฐานข้อมูลสำเร็จแล้ว!', 'สำเร็จ', () => location.reload());
+                        } else {
+                            showError(res.message);
+                        }
+                    });
+                });
+            };
+            reader.readAsText(file);
+        }
+
+        function handleReset() {
+            showConfirm('คำเตือน: คุณต้องการรีเซ็ตข้อมูลทั้งหมดกลับสู่ค่าเริ่มต้นใช่หรือไม่?', 'ยืนยันการรีเซ็ต', () => {
+                fetch('/api/database/reset', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        showSuccess('รีเซ็ตข้อมูลเริ่มต้นเรียบร้อยแล้ว', 'สำเร็จ', () => location.reload());
+                    } else {
+                        showError(res.message);
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

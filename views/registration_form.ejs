@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลงสมัครวิ่งออนไลน์ - <%= settings.event_name %></title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/assets/css/alert-popup.css">
+    <style>
+        body {
+            font-family: 'Kanit', sans-serif;
+            background-color: #f1f5f9;
+        }
+
+        .form-card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.06);
+            overflow: hidden;
+        }
+
+        .tab-btn {
+            border-radius: 12px !important;
+            font-weight: 600;
+            padding: 12px 20px;
+        }
+
+        .price-summary-box {
+            background: #f8fafc;
+            border: 2px dashed #cbd5e1;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .category-radio-card {
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .category-radio-card:hover, .category-radio-card.active {
+            border-color: #0d6efd;
+            background-color: #eff6ff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="/index.php">
+                <i class="fa-solid fa-person-running text-primary me-2"></i><%= settings.event_name %>
+            </a>
+            <div class="ms-auto">
+                <a href="/index.php" class="btn btn-outline-light btn-sm me-2">
+                    <i class="fa-solid fa-home me-1"></i>หน้าแรก
+                </a>
+                <a href="/check_status.php" class="btn btn-outline-light btn-sm me-2">
+                    <i class="fa-solid fa-magnifying-glass me-1"></i>ค้นหาสถานะ
+                </a>
+                <a href="/admin_index.php" class="btn btn-primary btn-sm">
+                    <i class="fa-solid fa-user-shield me-1"></i>ผู้ดูแลระบบ
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9">
+
+                <div class="card form-card mb-4">
+                    <div class="bg-primary text-white p-4">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h3 class="fw-bold mb-1"><i class="fa-solid fa-id-card me-2"></i>แบบฟอร์มลงสมัครวิ่งออนไลน์</h3>
+                                <p class="mb-0 text-white-50"><%= settings.event_name %> - <%= settings.event_subtitle %></p>
+                            </div>
+                            <i class="fa-solid fa-medal fa-3x opacity-50 d-none d-sm-block"></i>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Navigation Tabs -->
+                        <ul class="nav nav-pills nav-fill mb-4 p-1 bg-light rounded-4" id="regTabs" role="tablist">
+                            <li class="nav-item">
+                                <button class="nav-link tab-btn active" id="new-runner-tab" data-bs-toggle="pill" data-bs-target="#new-runner" type="button">
+                                    <i class="fa-solid fa-user-plus me-2"></i>1. สมัครแบบครบวงจร (นักวิ่งใหม่)
+                                </button>
+                            </li>
+                            <li class="nav-item">
+                                <button class="nav-link tab-btn" id="existing-runner-tab" data-bs-toggle="pill" data-bs-target="#existing-runner" type="button">
+                                    <i class="fa-solid fa-users me-2"></i>2. สมัครโดยใช้นักวิ่งเดิมในระบบ
+                                </button>
+                            </li>
+                        </ul>
+
+                        <div class="tab-content" id="regTabsContent">
+
+                            <!-- TAB 1: FAST 1-STEP UNIFIED REGISTRATION -->
+                            <div class="tab-pane fade show active" id="new-runner" role="tabpanel">
+                                <form id="fast-reg-form" onsubmit="handleFastRegister(event)">
+                                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                                        <i class="fa-solid fa-user text-primary me-2"></i>1. ข้อมูลส่วนตัวผู้สมัคร
+                                    </h5>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">ชื่อจริง <span class="text-danger">*</span></label>
+                                            <input type="text" name="first_name" class="form-control" required placeholder="เช่น สมชาย">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">นามสกุล <span class="text-danger">*</span></label>
+                                            <input type="text" name="last_name" class="form-control" required placeholder="เช่น ใจดี">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold">วันเกิด <span class="text-danger">*</span></label>
+                                            <input type="date" name="date_of_birth" id="birth-date" class="form-control" required onchange="calculateLiveFee()">
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold">เพศ <span class="text-danger">*</span></label>
+                                            <select name="gender" class="form-select" required>
+                                                <option value="Male">ชาย (Male)</option>
+                                                <option value="Female">หญิง (Female)</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-bold">เลขบัตรประชาชน (13 หลัก) <span class="text-danger">*</span></label>
+                                            <input type="text" name="citizen_id" class="form-control" pattern="[0-9]{13}" maxlength="13" required placeholder="เลข 13 หลัก">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">เบอร์โทรศัพท์ <span class="text-danger">*</span></label>
+                                            <input type="tel" name="phone" class="form-control" pattern="[0-9]{10}" maxlength="10" required placeholder="เช่น 0812345678">
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">อีเมล <span class="text-danger">*</span></label>
+                                            <input type="email" name="email" class="form-control" required placeholder="name@example.com">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label fw-bold">ที่อยู่จัดส่ง / ติดต่อ</label>
+                                            <textarea name="address" class="form-control" rows="2" placeholder="ที่อยู่ บ้านเลขที่ ซอย ถนน ตำบล อำเภอ จังหวัด รหัสไปรษณีย์"></textarea>
+                                        </div>
+                                        <div class="col-12">
+                                            <div class="form-check p-3 bg-light rounded-3 border">
+                                                <input class="form-check-input" type="checkbox" name="is_disabled" id="is_disabled_fast" onchange="calculateLiveFee()">
+                                                <label class="form-check-label fw-bold text-dark" for="is_disabled_fast">
+                                                    เป็นผู้พิการ (เพื่อรับสิทธิ์อัตราค่าสมัครพิเศษ)
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <h5 class="fw-bold text-dark border-bottom pb-2 mb-3">
+                                        <i class="fa-solid fa-flag-checkered text-primary me-2"></i>2. รายละเอียดการแข่งขัน & อุปกรณ์
+                                    </h5>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-12">
+                                            <label class="form-label fw-bold">เลือกระยะทางที่ต้องการลงแข่งขัน <span class="text-danger">*</span></label>
+                                            <div class="row g-3">
+                                                <% categories.forEach(function(cat) { %>
+                                                    <div class="col-md-4">
+                                                        <label class="w-100 h-100">
+                                                            <div class="category-radio-card h-100">
+                                                                <div class="form-check">
+                                                                    <input class="form-check-input" type="radio" name="category_id" value="<%= cat.category_id %>" <%= (selectedCat === cat.category_id || (!selectedCat && cat.category_id === 1)) ? 'checked' : '' %> onchange="calculateLiveFee()" required>
+                                                                    <span class="fw-bold fs-5 text-primary d-block"><%= cat.name %></span>
+                                                                    <strong class="text-dark fs-4"><%= cat.distance_km %> KM</strong>
+                                                                    <small class="text-muted d-block mt-1">ปล่อยตัว <%= cat.start_time %> น.</small>
+                                                                    <small class="text-success d-block"><i class="fa-solid fa-gift me-1"></i><%= cat.giveaway_type %></small>
+                                                                </div>
+                                                            </div>
+                                                        </label>
+                                                    </div>
+                                                <% }); %>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">ขนาดเสื้อที่ระลึก (Shirt Size) <span class="text-danger">*</span></label>
+                                            <select name="shirt_size" class="form-select form-select-lg" required>
+                                                <option value="S">S (รอบอก 36 นิ้ว / ยาว 26 นิ้ว)</option>
+                                                <option value="M">M (รอบอก 38 นิ้ว / ยาว 27 นิ้ว)</option>
+                                                <option value="L" selected>L (รอบอก 40 นิ้ว / ยาว 28 นิ้ว)</option>
+                                                <option value="XL">XL (รอบอก 42 นิ้ว / ยาว 29 นิ้ว)</option>
+                                                <option value="2XL">2XL (รอบอก 44 นิ้ว / ยาว 30 นิ้ว)</option>
+                                                <option value="3XL">3XL (รอบอก 46 นิ้ว / ยาว 31 นิ้ว)</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">วิธีการรับอุปกรณ์ (BIB & เสื้อ) <span class="text-danger">*</span></label>
+                                            <select name="shipping_id" id="shipping_select" class="form-select form-select-lg" onchange="calculateLiveFee()" required>
+                                                <% shipping_options.forEach(function(ship) { %>
+                                                    <option value="<%= ship.shipping_id %>" data-cost="<%= ship.cost %>">
+                                                        <%= ship.type %> (<%= Number(ship.cost) === 0 ? 'ฟรี' : Number(ship.cost) + ' บาท' %>) - <%= ship.detail %>
+                                                    </option>
+                                                <% }); %>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Price Calculation Box -->
+                                    <div class="price-summary-box mb-4">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-8">
+                                                <h5 class="fw-bold mb-1">สรุปยอดค่าใช้จ่ายในการสมัคร</h5>
+                                                <div class="text-muted small">
+                                                    <span id="rate-label">อัตราปกติ (Standard)</span>: <span id="fee-category" class="fw-bold">500.00</span> ฿ 
+                                                    + ค่าจัดส่ง: <span id="fee-shipping" class="fw-bold">0.00</span> ฿
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 text-md-end mt-3 mt-md-0">
+                                                <small class="text-muted d-block">ยอดชำระสุทธิ</small>
+                                                <h2 class="fw-bold text-success mb-0" id="total-fee-display">500.00 ฿</h2>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-success btn-lg py-3 fw-bold fs-5 shadow">
+                                            <i class="fa-solid fa-paper-plane me-2"></i>ยืนยันการสมัคร & ไปหน้าชำระเงิน
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- TAB 2: EXISTING RUNNER FAST SELECTION -->
+                            <div class="tab-pane fade" id="existing-runner" role="tabpanel">
+                                <form action="/save_registration.php" method="POST">
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">เลือกรายชื่อนักวิ่งในระบบ <span class="text-danger">*</span></label>
+                                        <select name="runner_id" class="form-select form-select-lg" required>
+                                            <option value="">-- เลือกรายชื่อนักวิ่ง --</option>
+                                            <% runners.forEach(function(runner) { %>
+                                                <option value="<%= runner.runner_id %>">
+                                                    <%= runner.first_name %> <%= runner.last_name %> (บัตร: <%= runner.citizen_id %>)
+                                                </option>
+                                            <% }); %>
+                                        </select>
+                                    </div>
+
+                                    <div class="mb-3">
+                                        <label class="form-label fw-bold">ประเภทการแข่งขัน <span class="text-danger">*</span></label>
+                                        <select name="category_id" class="form-select form-select-lg" required>
+                                            <% categories.forEach(function(cat) { %>
+                                                <option value="<%= cat.category_id %>">
+                                                    <%= cat.name %> (<%= cat.distance_km %> KM) - ปล่อยตัว <%= cat.start_time %>
+                                                </option>
+                                            <% }); %>
+                                        </select>
+                                    </div>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">ไซส์เสื้อ</label>
+                                            <select name="shirt_size" class="form-select" required>
+                                                <option value="S">S</option>
+                                                <option value="M">M</option>
+                                                <option value="L" selected>L</option>
+                                                <option value="XL">XL</option>
+                                                <option value="2XL">2XL</option>
+                                                <option value="3XL">3XL</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-bold">วิธีการรับของ</label>
+                                            <select name="shipping_id" class="form-select" required>
+                                                <% shipping_options.forEach(function(ship) { %>
+                                                    <option value="<%= ship.shipping_id %>">
+                                                        <%= ship.type %> (<%= Number(ship.cost) === 0 ? 'ฟรี' : Number(ship.cost) + ' บาท' %>)
+                                                    </option>
+                                                <% }); %>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-grid">
+                                        <button type="submit" class="btn btn-primary btn-lg py-3 fw-bold">
+                                            <i class="fa-solid fa-check me-2"></i>ลงทะเบียนรายการวิ่ง
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Registrations Card -->
+                <div class="card form-card">
+                    <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0 fw-bold"><i class="fa-solid fa-list-check text-primary me-2"></i>รายชื่อผู้สมัครล่าสุด</h5>
+                        <a href="/check_status.php" class="btn btn-outline-secondary btn-sm">
+                            <i class="fa-solid fa-search me-1"></i>ค้นหารายชื่อ
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Reg ID</th>
+                                        <th>ชื่อ-นามสกุล</th>
+                                        <th>ประเภท</th>
+                                        <th>ไซส์เสื้อ</th>
+                                        <th>สถานะ</th>
+                                        <th>BIB</th>
+                                        <th>ดำเนินการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% if (recentRegistrations.length > 0) { %>
+                                        <% recentRegistrations.forEach(function(reg) { %>
+                                            <tr>
+                                                <td class="fw-bold">#<%= reg.reg_id %></td>
+                                                <td><%= reg.first_name %> <%= reg.last_name %></td>
+                                                <td><span class="badge bg-secondary"><%= reg.category_name %></span></td>
+                                                <td><%= reg.shirt_size %></td>
+                                                <td>
+                                                    <% if (reg.status === 'Paid') { %>
+                                                        <span class="badge bg-success">ชำระแล้ว</span>
+                                                    <% } else { %>
+                                                        <span class="badge bg-warning text-dark">รอชำระเงิน</span>
+                                                    <% } %>
+                                                </td>
+                                                <td><span class="fw-bold text-primary"><%= reg.bib_number || '-' %></span></td>
+                                                <td>
+                                                    <% if (reg.status === 'Paid') { %>
+                                                        <a href="/e-ticket/<%= reg.reg_id %>" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fa-solid fa-ticket"></i> E-Ticket
+                                                        </a>
+                                                    <% } else { %>
+                                                        <a href="/payment_form.php?reg_id=<%= reg.reg_id %>" class="btn btn-sm btn-warning text-dark fw-bold">
+                                                            <i class="fa-solid fa-qrcode"></i> ชำระเงิน
+                                                        </a>
+                                                    <% } %>
+                                                </td>
+                                            </tr>
+                                        <% }); %>
+                                    <% } else { %>
+                                        <tr><td colspan="7" class="text-center py-4 text-muted">ยังไม่มีข้อมูลการสมัคร</td></tr>
+                                    <% } %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Pricing Dataset Embedded -->
+    <script>
+        const priceRates = <%- JSON.stringify(price_rates) %>;
+        const categories = <%- JSON.stringify(categories) %>;
+
+        function calculateLiveFee() {
+            const selectedCatInput = document.querySelector('input[name="category_id"]:checked');
+            const catId = selectedCatInput ? Number(selectedCatInput.value) : 1;
+            const isDisabled = document.getElementById('is_disabled_fast').checked;
+            const birthDateVal = document.getElementById('birth-date').value;
+            
+            let age = 30;
+            if (birthDateVal) {
+                const birthYear = new Date(birthDateVal).getFullYear();
+                age = 2026 - birthYear;
+            }
+
+            const catRates = priceRates.filter(p => p.category_id === catId);
+            let chosenRate = catRates.find(p => p.runner_type === 'Standard') || catRates[0] || { amount: 500 };
+            let rateLabel = 'อัตราปกติ (Standard)';
+
+            if (isDisabled) {
+                const dis = catRates.find(p => p.runner_type === 'Disabled');
+                if (dis) {
+                    chosenRate = dis;
+                    rateLabel = 'สิทธิ์ผู้พิการ (Disabled Discount)';
+                }
+            } else if (age >= 70) {
+                const sen = catRates.find(p => p.runner_type === 'Senior 70+' || p.runner_type.includes('70'));
+                if (sen) {
+                    chosenRate = sen;
+                    rateLabel = 'ผู้สูงอายุ 70 ปีขึ้นไป (Senior Discount)';
+                }
+            } else if (age < 23) {
+                const stu = catRates.find(p => p.runner_type === 'Student');
+                if (stu) {
+                    chosenRate = stu;
+                    rateLabel = 'นักเรียน / นักศึกษา (Student Discount)';
+                }
+            }
+
+            const shipSelect = document.getElementById('shipping_select');
+            const shipCost = Number(shipSelect.options[shipSelect.selectedIndex]?.dataset.cost || 0);
+
+            const catAmount = Number(chosenRate.amount);
+            const totalAmount = catAmount + shipCost;
+
+            document.getElementById('rate-label').textContent = rateLabel;
+            document.getElementById('fee-category').textContent = catAmount.toFixed(2);
+            document.getElementById('fee-shipping').textContent = shipCost.toFixed(2);
+            document.getElementById('total-fee-display').textContent = totalAmount.toFixed(2) + ' ฿';
+        }
+
+        function handleFastRegister(e) {
+            e.preventDefault();
+            const form = document.getElementById('fast-reg-form');
+            const formData = new FormData(form);
+            const data = Object.fromEntries(formData.entries());
+
+            fetch('/api/register-fast', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.success) {
+                    showSuccess('สมัครเข้าร่วมการแข่งขันเรียบร้อยแล้ว!', 'สมัครสำเร็จ', () => {
+                        window.location.href = res.redirectUrl || `/payment_form.php?reg_id=${res.reg_id}`;
+                    });
+                } else {
+                    showError(res.message || 'เกิดข้อผิดพลาดในการลงทะเบียน');
+                }
+            })
+            .catch(err => {
+                showError('เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์');
+            });
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', calculateLiveFee);
+    </script>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/alert-popup.js"></script>
+</body>
+
+</html>

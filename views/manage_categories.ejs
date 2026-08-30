@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการประเภทการแข่งขัน - Running Admin</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/alert-popup.css">
+</head>
+
+<body class="bg-light">
+
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-layer-group me-2"></i>จัดการประเภทการแข่งขัน (Race Categories)</span>
+            <a href="admin_index.php" class="btn btn-outline-light btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i>กลับแดชบอร์ด
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Add / Edit Form Card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0" id="form-title">เพิ่มประเภทการแข่งขันใหม่</h5>
+            </div>
+            <div class="card-body">
+                <form id="category-form" action="crud_category.php" method="POST">
+                    <input type="hidden" name="action" value="create" id="form-action">
+                    <input type="hidden" name="category_id" id="category_id">
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">ชื่อประเภทการแข่งขัน</label>
+                            <input type="text" name="name" id="name" class="form-control" placeholder="เช่น Fun Run, Marathon" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ระยะทาง (กิโลเมตร)</label>
+                            <input type="number" step="0.1" name="distance_km" id="distance_km" class="form-control" placeholder="เช่น 10.5" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">เวลาปล่อยตัว</label>
+                            <input type="time" name="start_time" id="start_time" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">เวลาจำกัด (Cut-off)</label>
+                            <input type="time" name="time_limit" id="time_limit" class="form-control" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">ของที่ระลึกที่ได้รับ</label>
+                            <input type="text" name="giveaway_type" id="giveaway_type" class="form-control" placeholder="เช่น เสื้อ + เหรียญที่ระลึก + อาหาร">
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-success" id="submit-btn">
+                            <i class="fa-solid fa-save me-1"></i>บันทึกข้อมูล
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                            <i class="fa-solid fa-times me-1"></i>ยกเลิก
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 fw-bold">รายการประเภทการแข่งขันทั้งหมด (<%= categories.length %> ประเภท)</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0 align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>ชื่อประเภท</th>
+                                <th>ระยะทาง</th>
+                                <th>เวลาปล่อยตัว</th>
+                                <th>เวลา Cut-off</th>
+                                <th>ของที่ระลึก</th>
+                                <th class="text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (categories.length > 0) { %>
+                                <% categories.forEach(function(cat) { %>
+                                    <tr>
+                                        <td><strong>#<%= cat.category_id %></strong></td>
+                                        <td class="fw-bold"><%= cat.name %></td>
+                                        <td><span class="badge bg-primary fs-6"><%= cat.distance_km %> KM</span></td>
+                                        <td><i class="fa-regular fa-clock me-1 text-muted"></i><%= cat.start_time %></td>
+                                        <td><%= cat.time_limit %></td>
+                                        <td><%= cat.giveaway_type || '-' %></td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-warning me-1" onclick="editCategory(<%= cat.category_id %>)">
+                                                <i class="fa-solid fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteCategory(<%= cat.category_id %>)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr><td colspan="7" class="text-center py-4 text-muted">ยังไม่มีข้อมูลประเภทการแข่งขัน</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/alert-popup.js"></script>
+    <script>
+        function resetForm() {
+            document.getElementById('category-form').reset();
+            document.getElementById('form-action').value = 'create';
+            document.getElementById('category_id').value = '';
+            document.getElementById('form-title').textContent = 'เพิ่มประเภทการแข่งขันใหม่';
+            document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-save me-1"></i>บันทึกข้อมูล';
+        }
+
+        function editCategory(id) {
+            fetch(`crud_category.php?action=get&id=${id}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        const d = res.data;
+                        document.getElementById('form-action').value = 'update';
+                        document.getElementById('category_id').value = d.category_id;
+                        document.getElementById('name').value = d.name;
+                        document.getElementById('distance_km').value = d.distance_km;
+                        document.getElementById('start_time').value = d.start_time ? d.start_time.slice(0, 5) : '';
+                        document.getElementById('time_limit').value = d.time_limit ? d.time_limit.slice(0, 5) : '';
+                        document.getElementById('giveaway_type').value = d.giveaway_type || '';
+
+                        document.getElementById('form-title').textContent = 'แก้ไขประเภทการแข่งขัน ID #' + d.category_id;
+                        document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-save me-1"></i>อัปเดตข้อมูล';
+                        document.getElementById('category-form').scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+        }
+
+        function deleteCategory(id) {
+            showConfirm('คุณแน่ใจหรือไม่ที่จะลบประเภทการแข่งขันนี้?', 'ยืนยันการลบ', () => {
+                fetch('crud_category.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `action=delete&category_id=${id}`
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        showSuccess(res.message, 'สำเร็จ', () => location.reload());
+                    } else {
+                        showError(res.message);
+                    }
+                });
+            });
+        }
+    </script>
+</body>
+
+</html>

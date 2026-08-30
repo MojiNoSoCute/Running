@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>จัดการข้อมูลนักวิ่ง - Running Admin</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/alert-popup.css">
+</head>
+
+<body class="bg-light">
+
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-dark bg-dark mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-person-running me-2"></i>จัดการข้อมูลนักวิ่ง (Runners Management)</span>
+            <a href="admin_index.php" class="btn btn-outline-light btn-sm">
+                <i class="fa-solid fa-arrow-left me-1"></i>กลับแดชบอร์ด
+            </a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Add / Edit Form Card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0" id="form-title">เพิ่มข้อมูลนักวิ่งใหม่</h5>
+            </div>
+            <div class="card-body">
+                <form id="runner-form" action="crud_runner.php" method="POST">
+                    <input type="hidden" name="action" value="create" id="form-action">
+                    <input type="hidden" name="runner_id" id="runner_id">
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">ชื่อ</label>
+                            <input type="text" name="first_name" id="first_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">นามสกุล</label>
+                            <input type="text" name="last_name" id="last_name" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">วันเกิด</label>
+                            <input type="date" name="date_of_birth" id="date_of_birth" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">เพศ</label>
+                            <select name="gender" id="gender" class="form-select" required>
+                                <option value="">-- เลือกเพศ --</option>
+                                <option value="Male">ชาย (Male)</option>
+                                <option value="Female">หญิง (Female)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">เลขบัตรประชาชน</label>
+                            <input type="text" name="citizen_id" id="citizen_id" class="form-control" pattern="[0-9]{13}" maxlength="13" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">เบอร์โทรศัพท์</label>
+                            <input type="tel" name="phone" id="phone" class="form-control" pattern="[0-9]{10}" maxlength="10" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">อีเมล</label>
+                            <input type="email" name="email" id="email" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ที่อยู่</label>
+                            <textarea name="address" id="address" class="form-control" rows="1" required></textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="is_disabled" id="is_disabled">
+                                <label class="form-check-label" for="is_disabled">
+                                    ผู้พิการ (สำหรับส่วนลดพิเศษ)
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <button type="submit" class="btn btn-primary" id="submit-btn">
+                            <i class="fa-solid fa-save me-1"></i>บันทึกข้อมูล
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">
+                            <i class="fa-solid fa-times me-1"></i>ยกเลิก
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Table Card -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                <h5 class="mb-0 fw-bold">รายชื่อนักวิ่งทั้งหมด (<%= runners.length %> คน)</h5>
+                <div class="input-group" style="width: 300px;">
+                    <input type="text" class="form-control" placeholder="ค้นหาชื่อ, บัตรประชาชน, เบอร์..." id="search-input">
+                    <button class="btn btn-outline-secondary" type="button"><i class="fa-solid fa-search"></i></button>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped mb-0 align-middle">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>ชื่อ-นามสกุล</th>
+                                <th>เพศ</th>
+                                <th>วันเกิด</th>
+                                <th>เลขบัตร ปชช.</th>
+                                <th>เบอร์โทร</th>
+                                <th>อีเมล</th>
+                                <th>สถานะ</th>
+                                <th class="text-center">จัดการ</th>
+                            </tr>
+                        </thead>
+                        <tbody id="runners-table">
+                            <% if (runners.length > 0) { %>
+                                <% runners.forEach(function(runner) { %>
+                                    <tr>
+                                        <td><strong>#<%= runner.runner_id %></strong></td>
+                                        <td><%= runner.first_name %> <%= runner.last_name %></td>
+                                        <td><%= runner.gender === 'Male' ? 'ชาย' : 'หญิง' %></td>
+                                        <td><%= runner.date_of_birth %></td>
+                                        <td><code><%= runner.citizen_id %></code></td>
+                                        <td><%= runner.phone %></td>
+                                        <td><%= runner.email %></td>
+                                        <td>
+                                            <% if (runner.is_disabled) { %>
+                                                <span class="badge bg-info">ผู้พิการ</span>
+                                            <% } else { %>
+                                                <span class="badge bg-light text-dark">ทั่วไป</span>
+                                            <% } %>
+                                        </td>
+                                        <td class="text-center">
+                                            <button class="btn btn-sm btn-warning me-1" onclick="editRunner(<%= runner.runner_id %>)">
+                                                <i class="fa-solid fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-danger" onclick="deleteRunner(<%= runner.runner_id %>)">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                <% }); %>
+                            <% } else { %>
+                                <tr><td colspan="9" class="text-center py-4 text-muted">ยังไม่มีข้อมูลนักวิ่งในระบบ</td></tr>
+                            <% } %>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/alert-popup.js"></script>
+    <script>
+        function resetForm() {
+            document.getElementById('runner-form').reset();
+            document.getElementById('form-action').value = 'create';
+            document.getElementById('runner_id').value = '';
+            document.getElementById('form-title').textContent = 'เพิ่มข้อมูลนักวิ่งใหม่';
+            document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-save me-1"></i>บันทึกข้อมูล';
+        }
+
+        function editRunner(id) {
+            fetch(`crud_runner.php?action=get&id=${id}`)
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        const d = res.data;
+                        document.getElementById('form-action').value = 'update';
+                        document.getElementById('runner_id').value = d.runner_id;
+                        document.getElementById('first_name').value = d.first_name;
+                        document.getElementById('last_name').value = d.last_name;
+                        document.getElementById('date_of_birth').value = d.date_of_birth;
+                        document.getElementById('gender').value = d.gender;
+                        document.getElementById('citizen_id').value = d.citizen_id;
+                        document.getElementById('phone').value = d.phone;
+                        document.getElementById('email').value = d.email;
+                        document.getElementById('address').value = d.address;
+                        document.getElementById('is_disabled').checked = (d.is_disabled == 1);
+
+                        document.getElementById('form-title').textContent = 'แก้ไขข้อมูลนักวิ่ง ID #' + d.runner_id;
+                        document.getElementById('submit-btn').innerHTML = '<i class="fa-solid fa-save me-1"></i>อัปเดตข้อมูล';
+                        document.getElementById('runner-form').scrollIntoView({ behavior: 'smooth' });
+                    }
+                });
+        }
+
+        function deleteRunner(id) {
+            showConfirm('คุณแน่ใจหรือไม่ที่จะลบข้อมูลนักวิ่ง ID #' + id + '?', 'ยืนยันการลบ', () => {
+                fetch('crud_runner.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `action=delete&runner_id=${id}`
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        showSuccess(res.message, 'สำเร็จ', () => location.reload());
+                    } else {
+                        showError(res.message, 'ไม่สามารถลบได้');
+                    }
+                });
+            });
+        }
+
+        // Filter search
+        document.getElementById('search-input').addEventListener('keyup', function() {
+            const val = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#runners-table tr');
+            rows.forEach(r => {
+                r.style.display = r.textContent.toLowerCase().includes(val) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+
+</html>

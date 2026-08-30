@@ -1,0 +1,19 @@
+{
+  "name": "running-event-management",
+  "version": "1.0.0",
+  "description": "Running Event and Registration Management System",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "build": "echo 'No build step required'"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "qrcode": "^1.5.4"
+  }
+}

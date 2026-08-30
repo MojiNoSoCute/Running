@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>เพิ่มกลุ่มอายุ</title>
+</head>
+
+<body class="bg-light">
+    <div class="container mt-4">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-secondary text-white fw-bold">
+                <i class="fa-solid fa-users-line me-2"></i>ข้อมูลกลุ่มอายุ (Age Group)
+            </div>
+            <div class="card-body">
+                <form action="save_age_group.php" method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">ประเภทการแข่งขัน</label>
+                            <select name="category_id" class="form-select" required>
+                                <option value="">-- เลือกประเภทการแข่งขัน --</option>
+                                <% categories.forEach(function(c) { %>
+                                    <option value="<%= c.category_id %>"><%= c.name %></option>
+                                <% }); %>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">เพศ</label>
+                            <select name="gender" class="form-select" required>
+                                <option value="">-- เลือกเพศ --</option>
+                                <option value="M">ชาย (Male)</option>
+                                <option value="F">หญิง (Female)</option>
+                                <option value="A">ทุกเพศ (All)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">อายุเริ่มต้น (Min)</label>
+                            <input type="number" name="min_age" class="form-control" placeholder="18" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label">อายุสิ้นสุด (Max)</label>
+                            <input type="number" name="max_age" class="form-control" placeholder="29" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ชื่อกลุ่ม (Label)</label>
+                            <input type="text" name="label" class="form-control" placeholder="เช่น 18-29 ปี" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-secondary mt-3 fw-bold">
+                        <i class="fa-solid fa-save me-1"></i>บันทึกกลุ่มอายุ
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="manage_age_groups.php" class="btn btn-secondary me-2"><i class="fa-solid fa-list me-1"></i>จัดการกลุ่มอายุ</a>
+            <a href="admin_index.php" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-1"></i>กลับหน้าหลัก</a>
+        </div>
+    </div>
+</body>
+
+</html>

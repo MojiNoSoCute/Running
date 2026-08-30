@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>เพิ่มตัวเลือกการจัดส่ง</title>
+</head>
+
+<body class="bg-light">
+    <div class="container mt-4">
+        <div class="card border-0 shadow-sm border-start border-primary border-4">
+            <div class="card-header bg-white fw-bold">
+                <i class="fa-solid fa-truck-fast me-2 text-primary"></i>ข้อมูลตัวเลือกการจัดส่ง (Shipping Option)
+            </div>
+            <div class="card-body">
+                <form action="save_shipping.php" method="POST">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">รูปแบบการรับ</label>
+                            <select name="type" class="form-select" required>
+                                <option value="">-- เลือกรูปแบบการรับ --</option>
+                                <option value="EMS">จัดส่งทางไปรษณีย์ (EMS)</option>
+                                <option value="Pickup">รับด้วยตัวเอง (Pickup)</option>
+                                <option value="Kerry">Kerry Express</option>
+                                <option value="Flash">Flash Express</option>
+                                <option value="J&T">J&T Express</option>
+                                <option value="DHL">DHL</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">ค่าบริการจัดส่ง (บาท)</label>
+                            <input type="number" step="0.01" name="cost" class="form-control" value="0.00" min="0" required>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">รายละเอียดเพิ่มเติม</label>
+                            <textarea name="detail" class="form-control" rows="2" placeholder="ระบุรายละเอียด เช่น จุดรับของ หรือระยะเวลาส่ง"></textarea>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3 fw-bold">
+                        <i class="fa-solid fa-save me-1"></i>บันทึกตัวเลือกการจัดส่ง
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="manage_shipping_options.php" class="btn btn-secondary me-2"><i class="fa-solid fa-list me-1"></i>จัดการตัวเลือกการจัดส่ง</a>
+            <a href="admin_index.php" class="btn btn-outline-secondary"><i class="fa-solid fa-arrow-left me-1"></i>กลับหน้าหลัก</a>
+        </div>
+    </div>
+</body>
+
+</html>
