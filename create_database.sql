@@ -97,7 +97,7 @@ INSERT INTO RACE_CATEGORY (name, distance_km, start_time, time_limit, giveaway_t
 ('Full Marathon', 42.2, '05:00:00', '06:00:00', 'เสื้อ + เหรียญ + ถ้วย + ใบประกาศ');
 
 INSERT INTO SHIPPING_OPTION (type, cost, detail) VALUES
-('Pickup', 0.00, 'รับด้วยตัวเองที่งาน วันที่ 15-16 มีนาคม 2026'),
+('Pickup', 0.00, 'รับด้วยตัวเองที่งาน วันที่ 15-16 มีนาคม 2025'),
 ('EMS', 50.00, 'จัดส่งทางไปรษณีย์ EMS ภายใน 7-10 วันทำการ'),
 ('Kerry', 45.00, 'จัดส่งผ่าน Kerry Express ภายใน 3-5 วันทำการ');
 

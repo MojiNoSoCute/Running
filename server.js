@@ -123,7 +123,7 @@ function calculatePriceRate(categoryId, runner) {
     }
     if (runner.date_of_birth) {
       const birthYear = new Date(runner.date_of_birth).getFullYear();
-      const age = 2026 - birthYear;
+      const age = 2025 - birthYear;
       if (age >= 70) {
         const seniorRate = rates.find(r => r.runner_type === 'Senior 70+' || r.runner_type.includes('70'));
         if (seniorRate) return seniorRate;
@@ -197,7 +197,7 @@ app.get(['/e-ticket/:id', '/print_ticket/:id'], async (req, res) => {
   }
 
   const details = getRegistrationDetails(reg);
-  const qrData = `RUN2026-REG:${details.reg_id}-BIB:${details.bib_number || 'PENDING'}-${details.citizen_id}`;
+  const qrData = `RUN2025-REG:${details.reg_id}-BIB:${details.bib_number || 'PENDING'}-${details.citizen_id}`;
   const qrImage = await generateQrDataUri(qrData);
 
   res.render('e_ticket', {
@@ -1193,7 +1193,7 @@ app.all(['/crud_shipping_option.php', '/api/shipping-options'], (req, res) => {
 // Export Registrations (CSV)
 app.get(['/export_registrations.php', '/export_registrations'], (req, res) => {
   res.setHeader('Content-Type', 'text/csv; charset=utf-8');
-  res.setHeader('Content-Disposition', 'attachment; filename="running_registrations_2026.csv"');
+  res.setHeader('Content-Disposition', 'attachment; filename="running_registrations_2025.csv"');
   
   let csv = '\uFEFFReg ID,ชื่อ-นามสกุล,เพศ,วันเกิด,เลขบัตรประชาชน,เบอร์โทร,อีเมล,ประเภทการแข่งขัน,ระยะทาง(KM),ไซส์เสื้อ,การจัดส่ง,ค่าสมัคร,ค่าส่ง,ยอดรวม,สถานะชำระเงิน,BIB,เช็คอิน,วันที่สมัคร\n';
   db.registrations.forEach(r => {
@@ -1234,7 +1234,7 @@ app.post('/api/database/reset', (req, res) => {
 app.get(['/api/health', '/check_errors.php'], (req, res) => {
   res.json({
     status: 'ok',
-    message: 'Running 2026 Production-Ready Node.js System is online',
+    message: 'Running 2025 Production-Ready Node.js System is online',
     timestamp: new Date().toISOString(),
     stats: {
       runners: db.runners.length,

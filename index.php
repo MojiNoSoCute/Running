@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CBM RUN 2026 - หน้าหลัก</title>
+    <title>CBM RUN 2025 - หน้าหลัก</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -48,7 +48,7 @@
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <div class="container">
             <a class="navbar-brand" href="index.php">
-                <i class="fa-solid fa-person-running text-warning me-2"></i>CBM RUN 2026
+                <i class="fa-solid fa-person-running text-warning me-2"></i>CBM RUN 2025
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -68,7 +68,7 @@
     <header class="hero-section">
         <div class="container">
             <h1 class="display-3 fw-bold">ก้าวข้ามขีดจำกัดไปกับเรา</h1>
-            <p class="lead mb-4">เปิดรับสมัครแล้ววันนี้! งานวิ่งเพื่อสุขภาพที่ใหญ่ที่สุดแห่งปี 2026</p>
+            <p class="lead mb-4">เปิดรับสมัครแล้ววันนี้! งานวิ่งเพื่อสุขภาพที่ใหญ่ที่สุดแห่งปี 2025</p>
             <a href="registration_form.php" class="btn btn-warning btn-lg btn-register">สมัครเลยตอนนี้ <i
                     class="fa-solid fa-arrow-right ms-2"></i></a>
         </div>
@@ -154,7 +154,7 @@
 
     <footer class="bg-dark text-white text-center py-4 mt-5">
         <div class="container">
-            <p class="mb-0">&copy; 2025 CBM RUN 2026 - All Rights Reserved</p>
+            <p class="mb-0">&copy; 2025 CBM RUN 2025 - All Rights Reserved</p>
             <small class="text-muted">Powered by PHP PDO & Bootstrap 5</small>
         </div>
     </footer>

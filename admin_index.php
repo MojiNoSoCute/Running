@@ -5,7 +5,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Running 2026 - Management System</title>
+    <title>Running 2025 - Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="assets/css/alert-popup.css">
@@ -61,7 +61,7 @@
 
     <nav class="navbar navbar-dark bg-dark mb-4">
         <div class="container">
-            <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-person-running me-2"></i> Running 2026 Admin</span>
+            <span class="navbar-brand mb-0 h1"><i class="fa-solid fa-person-running me-2"></i> Running 2025 Admin</span>
             <div class="navbar-nav">
                 <a class="nav-link text-warning" href="index.php"><i class="fa-solid fa-home me-1"></i>กลับหน้าหลัก</a>
             </div>
